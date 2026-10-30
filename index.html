@@ -1,0 +1,560 @@
+﻿<!-- Reverse Percentage Calculator Wrapper -->
+<div class="rpc-calculator-wrapper">
+  <div class="rpc-calculator-card">
+    
+    <!-- Top Header Banner -->
+    <div class="rpc-card-header">
+      <h2>Reverse Percentage Calculator</h2>
+      <p>Calculate original values before discounts/taxes, percentage change, and track history seamlessly.</p>
+    </div>
+
+    <!-- Mode Selector Tabs -->
+    <div class="rpc-tabs">
+      <button class="rpc-tab-btn active" onclick="switchRpcTab('mode1')">Original Value</button>
+      <button class="rpc-tab-btn" onclick="switchRpcTab('mode2')">% Change / Difference</button>
+      <button class="rpc-tab-btn" onclick="switchRpcTab('mode3')">Percentage of Value</button>
+    </div>
+
+    <!-- Main Content Layout (Inputs & Results) -->
+    <div class="rpc-content-grid">
+      
+      <!-- Input Panel -->
+      <div class="rpc-panel rpc-input-panel">
+        
+        <!-- Mode 1: Find Original Value -->
+        <div id="rpc-mode1" class="rpc-mode-content active">
+          <div class="rpc-form-group">
+            <label for="rpc-final-val">Final Amount (After Change)</label>
+            <input type="number" id="rpc-final-val" class="rpc-input-field" placeholder="e.g. 120" oninput="calculateReversePercentage()">
+          </div>
+          
+          <div class="rpc-form-row">
+            <div class="rpc-form-group">
+              <label for="rpc-change-type">Change Type</label>
+              <select id="rpc-change-type" class="rpc-input-field" onchange="calculateReversePercentage()">
+                <option value="increase">Increased (+ Tax/Markup)</option>
+                <option value="decrease">Decreased (- Discount/Off)</option>
+              </select>
+            </div>
+            <div class="rpc-form-group">
+              <label for="rpc-percent-val">Percentage (%)</label>
+              <input type="number" id="rpc-percent-val" class="rpc-input-field" placeholder="e.g. 20" oninput="calculateReversePercentage()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: Percentage Change -->
+        <div id="rpc-mode2" class="rpc-mode-content">
+          <div class="rpc-form-group">
+            <label for="rpc-initial-val">Initial / Starting Value</label>
+            <input type="number" id="rpc-initial-val" class="rpc-input-field" placeholder="e.g. 100" oninput="calculateReversePercentage()">
+          </div>
+          <div class="rpc-form-group">
+            <label for="rpc-new-val">New / Final Value</label>
+            <input type="number" id="rpc-new-val" class="rpc-input-field" placeholder="e.g. 150" oninput="calculateReversePercentage()">
+          </div>
+        </div>
+
+        <!-- Mode 3: Percentage of Total -->
+        <div id="rpc-mode3" class="rpc-mode-content">
+          <div class="rpc-form-group">
+            <label for="rpc-part-val">Part Value (X)</label>
+            <input type="number" id="rpc-part-val" class="rpc-input-field" placeholder="e.g. 25" oninput="calculateReversePercentage()">
+          </div>
+          <div class="rpc-form-group">
+            <label for="rpc-total-val">Total Value (Y)</label>
+            <input type="number" id="rpc-total-val" class="rpc-input-field" placeholder="e.g. 200" oninput="calculateReversePercentage()">
+          </div>
+        </div>
+
+        <button type="button" class="rpc-calc-btn" onclick="calculateReversePercentage(true)">
+          Calculate &amp; Save
+        </button>
+      </div>
+
+      <!-- Result Panel -->
+      <div class="rpc-panel rpc-results-panel">
+        <h3 class="panel-title">Result Breakdown</h3>
+        
+        <div class="rpc-result-box">
+          <span class="rpc-result-label" id="rpc-result-label">Original Value</span>
+          <div class="rpc-result-main" id="rpc-main-result">0.00</div>
+          <p class="rpc-result-sub" id="rpc-sub-result">Enter inputs above to view detailed results.</p>
+        </div>
+
+        <div class="rpc-action-row">
+          <button class="rpc-btn-outline" onclick="copyRpcResult()">📋 Copy Result</button>
+          <button class="rpc-btn-outline" onclick="resetRpcInputs()">🔄 Reset</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- History Section -->
+    <div class="rpc-history-container">
+      <div class="rpc-history-header">
+        <h3>📜 Calculation History</h3>
+        <button class="rpc-clear-history-btn" onclick="clearRpcHistory()">Clear History</button>
+      </div>
+      <div id="rpc-history-list" class="rpc-history-list">
+        <p class="rpc-no-history">No history saved yet. Calculate something to log results!</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* Base Wrapper Styling */
+  .rpc-calculator-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .rpc-calculator-wrapper * {
+    box-sizing: border-box;
+  }
+
+  .rpc-calculator-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 920px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    padding: 1.5rem;
+    overflow: hidden;
+  }
+
+  /* Header Banner */
+  .rpc-card-header {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .rpc-card-header h2 {
+    font-size: 1.75rem;
+    color: #166534;
+    font-weight: 700;
+    margin: 0 0 0.4rem 0;
+  }
+
+  .rpc-card-header p {
+    color: #15803d;
+    font-size: 0.92rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Mode Switcher Tabs */
+  .rpc-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    background: #f1f5f9;
+    padding: 0.35rem;
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+
+  .rpc-tab-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 0.6rem 0.8rem;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .rpc-tab-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Grid Layout */
+  .rpc-content-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .rpc-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .rpc-mode-content {
+    display: none;
+  }
+
+  .rpc-mode-content.active {
+    display: block;
+  }
+
+  .rpc-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .rpc-form-row {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .rpc-form-row .rpc-form-group {
+    flex: 1;
+  }
+
+  .rpc-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .rpc-input-field {
+    width: 100%;
+    height: 44px;
+    padding: 0 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #0f172a;
+    outline: none;
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+  }
+
+  .rpc-input-field:focus {
+    border-color: #16a34a;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+  }
+
+  .rpc-calc-btn {
+    width: 100%;
+    height: 46px;
+    background-color: #16a34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .rpc-calc-btn:hover {
+    background-color: #15803d;
+  }
+
+  /* Results Display */
+  .panel-title {
+    font-size: 1.1rem;
+    color: #0f172a;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+  }
+
+  .rpc-result-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .rpc-result-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .rpc-result-main {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #166534;
+    margin: 0.4rem 0;
+  }
+
+  .rpc-result-sub {
+    font-size: 0.85rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .rpc-action-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .rpc-btn-outline {
+    flex: 1;
+    height: 38px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .rpc-btn-outline:hover {
+    background-color: #f1f5f9;
+  }
+
+  /* History Container */
+  .rpc-history-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .rpc-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .rpc-history-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f172a;
+  }
+
+  .rpc-clear-history-btn {
+    background: transparent;
+    border: none;
+    color: #dc2626;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .rpc-clear-history-btn:hover {
+    text-decoration: underline;
+  }
+
+  .rpc-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .rpc-no-history {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin: 0;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .rpc-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .rpc-history-item .hist-desc {
+    color: #334155;
+  }
+
+  .rpc-history-item .hist-result {
+    font-weight: 700;
+    color: #166534;
+  }
+
+  .rpc-history-del {
+    color: #94a3b8;
+    cursor: pointer;
+    margin-left: 0.5rem;
+  }
+
+  .rpc-history-del:hover {
+    color: #dc2626;
+  }
+
+  /* Responsive Rules */
+  @media (max-width: 768px) {
+    .rpc-content-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  let currentRpcMode = 'mode1';
+  let rpcHistory = JSON.parse(localStorage.getItem('rpc_history_data') || '[]');
+
+  function switchRpcTab(mode) {
+    currentRpcMode = mode;
+    document.querySelectorAll('.rpc-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.rpc-mode-content').forEach(content => content.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(`rpc-${mode}`).classList.add('active');
+
+    // Update Label
+    const label = document.getElementById('rpc-result-label');
+    if (mode === 'mode1') label.innerText = "Original Value";
+    else if (mode === 'mode2') label.innerText = "Percentage Change";
+    else label.innerText = "Calculated Percentage";
+
+    calculateReversePercentage(false);
+  }
+
+  function calculateReversePercentage(saveToHistory = false) {
+    let result = 0;
+    let labelText = "";
+    let subText = "";
+    let isValid = false;
+
+    if (currentRpcMode === 'mode1') {
+      const finalVal = parseFloat(document.getElementById('rpc-final-val').value);
+      const percent = parseFloat(document.getElementById('rpc-percent-val').value);
+      const type = document.getElementById('rpc-change-type').value;
+
+      if (!isNaN(finalVal) && !isNaN(percent)) {
+        isValid = true;
+        if (type === 'increase') {
+          result = finalVal / (1 + (percent / 100));
+          subText = `Original value before +${percent}% increase was ${result.toFixed(2)}`;
+        } else {
+          result = finalVal / (1 - (percent / 100));
+          subText = `Original value before -${percent}% discount was ${result.toFixed(2)}`;
+        }
+        labelText = `Final: ${finalVal} (${type === 'increase' ? '+' : '-'}${percent}%)`;
+      }
+    } 
+    else if (currentRpcMode === 'mode2') {
+      const initialVal = parseFloat(document.getElementById('rpc-initial-val').value);
+      const newVal = parseFloat(document.getElementById('rpc-new-val').value);
+
+      if (!isNaN(initialVal) && !isNaN(newVal) && initialVal !== 0) {
+        isValid = true;
+        result = ((newVal - initialVal) / Math.abs(initialVal)) * 100;
+        const diff = newVal - initialVal;
+        subText = `${diff >= 0 ? 'Increase' : 'Decrease'} of ${Math.abs(diff).toFixed(2)} (${result.toFixed(2)}%)`;
+        labelText = `${initialVal} ➔ ${newVal}`;
+      }
+    } 
+    else if (currentRpcMode === 'mode3') {
+      const partVal = parseFloat(document.getElementById('rpc-part-val').value);
+      const totalVal = parseFloat(document.getElementById('rpc-total-val').value);
+
+      if (!isNaN(partVal) && !isNaN(totalVal) && totalVal !== 0) {
+        isValid = true;
+        result = (partVal / totalVal) * 100;
+        subText = `${partVal} is ${result.toFixed(2)}% of total ${totalVal}`;
+        labelText = `${partVal} of ${totalVal}`;
+      }
+    }
+
+    if (isValid) {
+      const formattedResult = currentRpcMode === 'mode2' || currentRpcMode === 'mode3' ? `${result.toFixed(2)}%` : result.toFixed(2);
+      document.getElementById('rpc-main-result').innerText = formattedResult;
+      document.getElementById('rpc-sub-result').innerText = subText;
+
+      if (saveToHistory) {
+        addRpcHistory(labelText, formattedResult);
+      }
+    } else {
+      document.getElementById('rpc-main-result').innerText = "0.00";
+      document.getElementById('rpc-sub-result').innerText = "Please enter valid input numbers above.";
+    }
+  }
+
+  /* History Management Functions */
+  function addRpcHistory(desc, res) {
+    const item = { desc, res, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+    rpcHistory.unshift(item);
+    if (rpcHistory.length > 10) rpcHistory.pop(); // Keep last 10 entries
+    localStorage.setItem('rpc_history_data', JSON.stringify(rpcHistory));
+    renderRpcHistory();
+  }
+
+  function renderRpcHistory() {
+    const list = document.getElementById('rpc-history-list');
+    if (rpcHistory.length === 0) {
+      list.innerHTML = `<p class="rpc-no-history">No history saved yet. Calculate something to log results!</p>`;
+      return;
+    }
+
+    list.innerHTML = rpcHistory.map((item, index) => `
+      <div class="rpc-history-item">
+        <div>
+          <span class="hist-desc">${item.desc}</span>
+          <small style="color:#94a3b8; margin-left: 6px;">(${item.timestamp})</small>
+        </div>
+        <div>
+          <span class="hist-result">${item.res}</span>
+          <span class="rpc-history-del" onclick="deleteRpcHistoryItem(${index})">✖</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function deleteRpcHistoryItem(index) {
+    rpcHistory.splice(index, 1);
+    localStorage.setItem('rpc_history_data', JSON.stringify(rpcHistory));
+    renderRpcHistory();
+  }
+
+  function clearRpcHistory() {
+    rpcHistory = [];
+    localStorage.removeItem('rpc_history_data');
+    renderRpcHistory();
+  }
+
+  function copyRpcResult() {
+    const res = document.getElementById('rpc-main-result').innerText;
+    navigator.clipboard.writeText(res);
+    alert(`Copied result: ${res}`);
+  }
+
+  function resetRpcInputs() {
+    document.querySelectorAll('.rpc-input-field').forEach(input => input.value = '');
+    document.getElementById('rpc-main-result').innerText = "0.00";
+    document.getElementById('rpc-sub-result').innerText = "Enter inputs above to view detailed results.";
+  }
+
+  // Load History on Startup
+  document.addEventListener("DOMContentLoaded", function() {
+    renderRpcHistory();
+  });
+  renderRpcHistory();
+</script>
+  </script><p>Powered by <a href="https://freecalctools.net/" target="_blank">Free Calc Tools</a></p>
